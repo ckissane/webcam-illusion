@@ -1939,7 +1939,7 @@
             camera.position.x = fixedPosition[0] + (event.x * scaling * params.damping);
             camera.position.y = fixedPosition[1] + (event.y * scaling * params.damping);
             camera.position.z = fixedPosition[2] + Math.abs((event.z * scaling));
-            console.log(camera.position);
+            // console.log(camera.position);
 
             // update lookAt?
             // camera.lookAt(new THREE.Vector3(fixedPosition[0], fixedPosition[1], fixedPosition[2]))
@@ -2010,7 +2010,7 @@
             var yOffset = event.y < 0 ? 0 : event.y * 2 * scaling;
             camera.aspect = Math.pow((ww + Math.abs(event.x * 2 * scaling)) / (wh + Math.abs(event.y * 2 * scaling)), 1);
             camera.updateProjectionMatrix();
-            console.log(ww);
+            // console.log(ww);
             // console.log(window.xOffset)
             camera.setViewOffset(ww + Math.abs(event.x * scaling) * 2, wh + Math.abs(event.y * 2 * scaling), xOffset, yOffset, ww, wh);
             // camera.fullWidth = ww + Math.abs(event.x * scaling) * 2;

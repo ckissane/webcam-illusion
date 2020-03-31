@@ -10,6 +10,7 @@
     <script charset="utf-8" src="js/three.js"></script>
 
     <script src="./js/Stats.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.min.js" integrity="sha256-HJ7j+71YYw6Kcs8THwQV9lXmPOcR0eXlg7n8KRTZsyA=" crossorigin="anonymous"></script>
     <script src="./js/Detector.js"></script>
     <style>
         body {
@@ -30,6 +31,11 @@
         <button id="directionalButton">toggle directional light</button>
     </div>
 
+
+    <canvas id="compare" width="320" height="240" style="display:none"></canvas>
+    <video id="vid" autoplay loop></video>
+
+    <script src="./js/headtrackr.js"></script>
     <script type="x-shader/x-vertex" id="vertexShader">
 
         varying vec3 vWorldPosition; void main() { vec4 worldPosition = modelMatrix * vec4( position, 1.0 ); vWorldPosition = worldPosition.xyz; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }
@@ -43,12 +49,39 @@
 
     </script>
 
+
     <script>
-        var camera, scene, renderer, dirLight, dirLightHeper, hemiLight, hemiLightHelper;
+        var camera, scene, renderer, dirLight, dirLightHeper, hemiLight, hemiLightHelper, vidtexture, vmesh, cubeCamera, vmaterial, txtmaterial;
         var mixers = [];
         var stats;
 
         var clock = new THREE.Clock();
+        var IllusionSettings = function() {
+            this.elevationOfCameraToCenterOfScreen = 11.5;
+            this.screenHeight = 20.32;
+            // Define render logic ...
+        };
+
+        window.distance_from_camera_to_screen = 11.5;
+        window.screenHeight = 20.32;
+        const gui = new dat.GUI({
+            autoplace: false,
+            width: 400,
+            height: 9 * 32 - 1
+        });
+        var settings = new IllusionSettings();
+        gui.add(settings, 'elevationOfCameraToCenterOfScreen', -100, 100, 0.1).name("Cam Elev Over Screen Mid (cm)").onChange(function(value) {
+            window.distance_from_camera_to_screen = value;
+        });
+        gui.add(settings, 'screenHeight', 10, 300, 0.1).name("Screen Height (cm)").onChange(function(value) {
+            window.screenHeight = value;
+        });
+        if (!Detector.webgl) Detector.addGetWebGLMessage();
+
+        var videoInput = document.getElementById('vid');
+        var canvasInput = document.getElementById('compare');
+
+
 
         init();
         animate();
@@ -101,6 +134,20 @@
 
             // dirLightHeper = new THREE.DirectionalLightHelper(dirLight, 10);
             // scene.add(dirLightHeper);
+
+
+
+            // vidtexture = new THREE.Texture(videoInput);
+            // vidtexture.minFilter = THREE.LinearFilter;
+            // vmaterial = new THREE.MeshBasicMaterial({
+            //     map: vidtexture
+            // });
+            // var vgeometry = new THREE.BoxGeometry(1, 1, 1);
+            // vmesh = new THREE.Mesh(vgeometry, vmaterial);
+            // vmesh.position.z = -100;
+            // scene.add(vmesh);
+            // cubeCamera = new THREE.CubeCamera(1, 5000, 1024);
+            // scene.add(cubeCamera);
 
             // GROUND
 
@@ -172,10 +219,10 @@
                         bevelOffset: 0,
                         bevelSegments: 5
                     });
-                    var material = new THREE.MeshLambertMaterial({
+                    txtmaterial = new THREE.MeshLambertMaterial({
                         color: 0xffffff
                     });
-                    var mesh = new THREE.Mesh(geometry, material);
+                    var mesh = new THREE.Mesh(geometry, txtmaterial);
 
                     var s = 0.35;
                     // mesh.scale.set(s, s, s);
@@ -221,8 +268,8 @@
             //     // mixers.push(mixer);
 
             // })();
-            var screenH = 20.32;
-            var screenW = 20.32 * 16 / 9;
+            var screenH = window.screenHeight;
+            var screenW = screenH * window.innerWidth / window.innerHeight;
             (function(gltf) {
 
                 // var mesh = gltf.scene.children[0];
@@ -401,42 +448,26 @@
                 mixers[i].update(delta);
 
             }
-
+            // cubeCamera.updateCubeMap(renderer, scene);
+            // cubeCamera.position.y = 15;
+            // if (vidtexture) {
+            //     vidtexture.needsUpdate = true;
+            // }
+            // var smd = 100;
+            // vmesh.position.set(0, 15, smd + 0.5)
+            // var sz = videoInput.getBoundingClientRect();
+            // vmesh.scale.set(window.screenHeight * sz.width / sz.height * smd, window.screenHeight * smd, 1)
+            // txtmaterial.envMap = cubeCamera.renderTarget.texture
             renderer.render(scene, camera);
 
         }
     </script>
 
-    <script src="./js/headtrackr.js"></script>
-
-    <canvas id="compare" width="320" height="240" style="display:none"></canvas>
-    <video id="vid" autoplay loop></video>
 
     <script>
-        if (!Detector.webgl) Detector.addGetWebGLMessage();
-
-        var videoInput = document.getElementById('vid');
-        var canvasInput = document.getElementById('compare');
-
         // 3d model setup
 
         var stats;
-        // var camera, scene, renderer;
-        // var plane;
-
-
-        // function animate() {
-
-        //     // renderer.render(scene, camera);
-        //     stats.update();
-
-        //     requestAnimationFrame(animate);
-        //     camera.updateProjectionMatrix();
-
-        // }
-
-        // init();
-        // animate();
 
         // video styling
         videoInput.style.position = 'absolute';

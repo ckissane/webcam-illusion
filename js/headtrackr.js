@@ -1833,9 +1833,9 @@
 
 
             // Transformation from position relative to camera, to position relative to center of screen
-            if (params.distance_from_camera_to_screen === undefined) {
+            if (params.distance_from_camera_to_screen === undefined || true) {
                 // default is 11.5 cm approximately
-                y = y + 11.5;
+                y = y + window.distance_from_camera_to_screen;
             } else {
                 y = y + params.distance_from_camera_to_screen;
             }
@@ -1972,10 +1972,11 @@
         window.qX = 1;
         //window.asp = 1;
         if (params === undefined) params = {};
-        if (params.screenHeight === undefined) {
-            var screenHeight_cms = 20.32;
+        var screenHeight_cms = 0;
+        if (params.screenHeight === undefined || true) {
+            screenHeight_cms = window.screenHeight;
         } else {
-            var screenHeight_cms = params.screenHeight;
+            screenHeight_cms = params.screenHeight;
         }
 
         var scene = camera.parent;
@@ -1998,6 +1999,7 @@
         document.addEventListener('headtrackingEvent', function(event) {
             //event.x = window.qX;
             //event.y = 0;
+            screenHeight_cms = window.screenHeight;
             var wh = screenHeight_cms * scaling;
             var ww = wh * window.innerWidth / window.innerHeight;
 
